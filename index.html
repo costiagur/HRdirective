@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>הוראות שכר</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  </head>
+
+  <body data-codeword="myorders" dir="rtl">  
+    <div class="w3-container w3-cell">
+      <table>
+        <tbody>
+          <tr style="display:none">
+            <th>מספר הוראה</th>
+            <td>
+              <input type="number" id="ordernum_in" class="w3-input">
+              <input type="number" id="subordernum_in" class="w3-input">
+            </td>
+          </tr>
+          <tr>
+            <th>עובד</th>
+            <td><input type="text" id="emp_in" class="w3-input" list="emplist"></td>
+            <datalist id="emplist"></datalist>
+          </tr>
+          <tr>
+            <th>יעוד הוראה</th>
+            <td><input type="text" id="target_in" class="w3-input" list="targetlist"></td>
+            <datalist id="targetlist"></datalist>
+          </tr>
+          <tr>
+            <th>נושא הוראה</th>
+            <td><input type="text" id="subject_in" class="w3-input" list="subjectlist"></td>
+            <datalist id="subjectlist"></datalist>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <div class="w3-container w3-cell">
+                <p>תאריך תחילה</p>
+                <p style="margin-top: 30px;">תאריך סיום</p>
+              </div>
+              <div class="w3-container w3-cell">
+                <p><input type="date" id="start_in" class="w3-input"></p>
+                <p><input type="date" id="end_in" class="w3-input"></p>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th>תוכן הוראה</th>
+            <td>
+              <textarea cols="50" rows="20" id="text_in"></textarea>
+            </td>
+          </tr>
+          <tr>
+            <th>אסמכתא</th>
+            <td>
+              <textarea cols="50" rows="2" id="reference_in"></textarea>
+            </td>
+          </tr>
+          <tr>
+            <th>הוסף קובץ</th>
+            <td><input type="file" id="reffile_in"></td>
+          </tr>
+          <tr>
+            <th>טען הוראה בקובץ</th>
+            <td><input type="file" id="orderfile_in"></td>
+          </tr>
+        </tbody>
+      </table>
+    <br>
+    <div class="w3-container">
+      <div class="w3-container w3-cell" id="clearbtn">
+        <button onclick='myfunc.clear()' class="w3-btn w3-round w3-light-green" style="padding-left:40px;text-align: center;">נקה</button>
+      </div>
+      <div class="w3-container w3-cell" id="submitbtn">
+        <button onclick='myfunc.submitorder()' class="w3-btn w3-round w3-light-green" style="padding-left:40px;text-align: center;">שלח לאישור</button>
+      </div>
+      <div class="w3-container w3-cell" id="authbtn">
+        <button onclick='myfunc.authorder()' class="w3-btn w3-round w3-light-green" style="padding-left:40px;text-align: center;">אשר</button>
+      </div>
+      <div class="w3-container w3-cell" id="cancelbtn">
+        <button onclick='myfunc.cancelorder()' class="w3-btn w3-round w3-light-green" style="padding-left:40px;text-align: center;">בטל</button>
+      </div>
+    </div>
+    <div class="w3-container w3-cell">
+      <table>
+        <tbody id="showres"></tbody>
+      </table>
+    </div>
+    
+  </body>
+
+  <script src='uiclient.js'></script>
+  <script src='myfunc.js'></script>
+
+</html>
