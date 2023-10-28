@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"> 
 
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <style>
+      .dontdisplay {
+        display:none;
+      }
+    </style>
+  
   </head>
 
   <body data-codeword="myorders" dir="rtl">  
@@ -16,12 +22,19 @@
             <th>מספר הוראה</th>
             <td>
               <input type="number" id="ordernum_in" class="w3-input">
-              <input type="number" id="subordernum_in" class="w3-input">
             </td>
           </tr>
           <tr>
-            <th>עובד</th>
-            <td><input type="text" id="emp_in" class="w3-input" list="emplist"></td>
+            <th>
+              <select id="insselect" onchange="myfunc.oneorarea()">
+                <option value="0" selected>עובד בודד</option>
+                <option value="1">רשימת עובדים</option>
+              </select>
+            </th>
+            <td>
+              <input type="text" id="emp_in" class="w3-input" list="emplist">
+              <textarea id="emp_area" rows="5" cols="33" placeholder="מספר עובד, נתון 1, נתון 2 ..." class="dontdisplay"></textarea>
+            </td>
             <datalist id="emplist"></datalist>
           </tr>
           <tr>
@@ -62,10 +75,6 @@
           <tr>
             <th>הוסף קובץ</th>
             <td><input type="file" id="reffile_in"></td>
-          </tr>
-          <tr>
-            <th>טען הוראה בקובץ</th>
-            <td><input type="file" id="orderfile_in"></td>
           </tr>
         </tbody>
       </table>
