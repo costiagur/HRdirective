@@ -70,3 +70,14 @@ myfunc.download = function(filename, filetext){
     document.body.removeChild(a);
 
 }
+//********************************************************************************************* */
+myfunc.oneorarea = function(){
+    if (document.getElementById("insselect").value == "0"){
+        document.getElementById("emp_in").classList.remove("dontdisplay")
+        document.getElementById("emp_area").classList.add("dontdisplay")
+    }
+    else if (document.getElementById("insselect").value == "1"){
+        document.getElementById("emp_in").classList.add("dontdisplay")
+        document.getElementById("emp_area").classList.remove("dontdisplay")
+    }
+}
