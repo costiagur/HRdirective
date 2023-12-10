@@ -4,104 +4,66 @@
     <title>הוראות שכר</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1"> 
-
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="w3.css">
+    <script src='uiclient.js'></script>
     <style>
-      .dontdisplay {
-        display:none;
+      .dateinput {
+        padding:8px;display:inline;border:none;border-bottom:1px solid #ccc;
       }
     </style>
-  
   </head>
 
-  <body data-codeword="myorders" dir="rtl">  
-    <div class="w3-container w3-cell">
-      <table>
-        <tbody>
-          <tr style="display:none">
-            <th>מספר הוראה</th>
-            <td>
-              <input type="number" id="ordernum_in" class="w3-input">
-            </td>
-          </tr>
-          <tr>
-            <th>
-              <select id="insselect" onchange="myfunc.oneorarea()">
-                <option value="0" selected>עובד בודד</option>
-                <option value="1">רשימת עובדים</option>
-              </select>
-            </th>
-            <td>
-              <input type="text" id="emp_in" class="w3-input" list="emplist">
-              <textarea id="emp_area" rows="5" cols="33" placeholder="מספר עובד, נתון 1, נתון 2 ..." class="dontdisplay"></textarea>
-            </td>
-            <datalist id="emplist"></datalist>
-          </tr>
-          <tr>
-            <th>יעוד הוראה</th>
-            <td><input type="text" id="target_in" class="w3-input" list="targetlist"></td>
-            <datalist id="targetlist"></datalist>
-          </tr>
-          <tr>
-            <th>נושא הוראה</th>
-            <td><input type="text" id="subject_in" class="w3-input" list="subjectlist"></td>
-            <datalist id="subjectlist"></datalist>
-          </tr>
-          <tr>
-            <td></td>
-            <td>
-              <div class="w3-container w3-cell">
-                <p>תאריך תחילה</p>
-                <p style="margin-top: 30px;">תאריך סיום</p>
-              </div>
-              <div class="w3-container w3-cell">
-                <p><input type="date" id="start_in" class="w3-input"></p>
-                <p><input type="date" id="end_in" class="w3-input"></p>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <th>תוכן הוראה</th>
-            <td>
-              <textarea cols="50" rows="20" id="text_in"></textarea>
-            </td>
-          </tr>
-          <tr>
-            <th>אסמכתא</th>
-            <td>
-              <textarea cols="50" rows="2" id="reference_in"></textarea>
-            </td>
-          </tr>
-          <tr>
-            <th>הוסף קובץ</th>
-            <td><input type="file" id="reffile_in"></td>
-          </tr>
-        </tbody>
-      </table>
-    <br>
-    <div class="w3-container">
-      <div class="w3-container w3-cell" id="clearbtn">
-        <button onclick='myfunc.clear()' class="w3-btn w3-round w3-light-green" style="padding-left:40px;text-align: center;">נקה</button>
-      </div>
-      <div class="w3-container w3-cell" id="submitbtn">
-        <button onclick='myfunc.submitorder()' class="w3-btn w3-round w3-light-green" style="padding-left:40px;text-align: center;">שלח לאישור</button>
-      </div>
-      <div class="w3-container w3-cell" id="authbtn">
-        <button onclick='myfunc.authorder()' class="w3-btn w3-round w3-light-green" style="padding-left:40px;text-align: center;">אשר</button>
-      </div>
-      <div class="w3-container w3-cell" id="cancelbtn">
-        <button onclick='myfunc.cancelorder()' class="w3-btn w3-round w3-light-green" style="padding-left:40px;text-align: center;">בטל</button>
-      </div>
-    </div>
-    <div class="w3-container w3-cell">
-      <table>
-        <tbody id="showres"></tbody>
-      </table>
-    </div>
-    
-  </body>
+  <body dir="rtl">
 
-  <script src='uiclient.js'></script>
-  <script src='myfunc.js'></script>
+    <datalist id="type_list"></datalist>
+
+    <datalist id="addressee_list"></datalist>
+
+    <datalist id="empid_list"></datalist>
+    
+    <datalist id="empname_list"></datalist>
+    <div class="w3-container" id="orderer_name"></div>
+
+    <h2 style = "text-align: center;" id="ordertype">סוג האחראי</h2>
+    <div class="w3-container w3-cell">
+          <div class="w3-container">
+            <div class="w3-container">
+              <label for="addressee_in">נמען</label>
+              <input list="addressee_list" id="addressee_in" class = "w3-input">
+            </div>
+            <div class="w3-container">
+              <label for="type_in">סוג</label>
+              <input list="type_list" id="type_in" class="w3-input">
+            </div>
+            <div class="w3-container">
+              <label for="empid_in">מספר עובד</label>
+              <input list="empid_list" id="empid_in" class="w3-input" onchange="ui.getempname('onchange')">
+            </div>
+            <div class="w3-container">
+              <label for="empname_in">שם עובד</label>
+              <input list="empname_list" id="empname_in" class="w3-input" oninput="ui.getempname('oninput')">
+            </div>
+            <div class="w3-container">
+              <div>תאריכים <label for="startdate_in">תחילה:</label>
+                <span><input type="date" id="startdate_in" class="dateinput"></span>
+                <label for="enddate_in">סיום:</label>
+                <span><input type="date" id="enddate_in" class="dateinput" value="2099-12-31"></span>
+            </div>
+            <div class="w3-container">
+              <label for="text_in" style="vertical-align: top;">תוכן ההוראה</label>
+              <textarea id="text_in" placeholder="מקום להזנת ההוראה" rows="4" cols="50"></textarea>
+            </div>
+            <div class="w3-container">
+              <label for="reference_in">אסמכתא להוראה</label>
+              <input type="text" id="reference_in" class="w3-input">
+            </div>
+            <div class="w3-container">
+              <label for="reference_in">מסמכים לצירוף</label>
+              <input type="file" id="reffiles_in" multiple>
+            </div>
+          </div>
+    </div>
+    <div class="w3-container w3-cell" id="showdata_order"></div>
+  </body>
 
 </html>

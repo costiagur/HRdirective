@@ -1,8 +1,7 @@
 import base64
 import json
-import common
-
-CODESTR = "myorders"
+from tkinter import messagebox
+import db
 
 def myfunc(queryobj):
     try:
@@ -11,6 +10,14 @@ def myfunc(queryobj):
         
         print("POST = " + str(postdict) + "\n")
         print("FILES = " + str(filesdict) + "\n")
+
+        mydb = db.MYSQLDB()
+
+        if postdict['request'] == 'inserttemp':
+            rowsinserted = mydb.inserttemp()
+            replymsg = rowsinserted.encode('UTF-8')
+        #
+
 
         # reply message should be encoded to be sent back to browser ----------------------------------------------
         # encoding to base64 is used to send ansi hebrew data. it is decoded to become string and put into json.
@@ -30,7 +37,6 @@ def myfunc(queryobj):
     #
     
     except Exception as e:
-        common.errormsg(title=__name__,message=e)
         replymsg = json.dumps(["Error","myfunc -" + str(e)]).encode('UTF-8')
         return replymsg
     #
