@@ -5,15 +5,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1"> 
     <link rel="stylesheet" href="w3.css">
-    <script src='uiclient.js'></script>
     <style>
       .dateinput {
         padding:8px;display:inline;border:none;border-bottom:1px solid #ccc;
+        margin-top:12px;margin-bottom:12px;margin-left:4px;
+      }
+      .textareastyle {border:none;border-bottom:1px solid #ccc;padding:8px;}
+      .nodisplay {
+        display:none;
       }
     </style>
   </head>
 
-  <body dir="rtl">
+  <body dir="rtl" data-codeword="hrorder">
 
     <datalist id="type_list"></datalist>
 
@@ -22,48 +26,66 @@
     <datalist id="empid_list"></datalist>
     
     <datalist id="empname_list"></datalist>
-    <div class="w3-container" id="orderer_name"></div>
+    
+    <div class="w3-container">
+      <h4 style = "text-align: right;">שלום <span id="username"></span></h4>
+    </div>
 
-    <h2 style = "text-align: center;" id="ordertype">סוג האחראי</h2>
+    <div class="w3-container">
+      <h2 id="ordertype">הוראה</h2>
+    </div>
+
     <div class="w3-container w3-cell">
           <div class="w3-container">
-            <div class="w3-container">
+            <div class="w3-container orderer manager inputfield">
               <label for="addressee_in">נמען</label>
               <input list="addressee_list" id="addressee_in" class = "w3-input">
             </div>
-            <div class="w3-container">
+            <div class="w3-container orderer manager searcher inputfield">
               <label for="type_in">סוג</label>
               <input list="type_list" id="type_in" class="w3-input">
             </div>
-            <div class="w3-container">
+            <div class="w3-container orderer manager searcher inputfield">
               <label for="empid_in">מספר עובד</label>
-              <input list="empid_list" id="empid_in" class="w3-input" onchange="ui.getempname('onchange')">
+              <input list="empid_list" id="empid_in" class="w3-input" oninput="myfunc.getidname(this.value,this.id)" onchange="myfunc.setidname(this.value,this.id)">
             </div>
-            <div class="w3-container">
+            <div class="w3-container orderer manager searcher inputfield">
               <label for="empname_in">שם עובד</label>
-              <input list="empname_list" id="empname_in" class="w3-input" oninput="ui.getempname('oninput')">
+              <input list="empname_list" id="empname_in" class="w3-input" oninput="myfunc.getidname(this.value,this.id)" onchange="myfunc.setidname(this.value,this.id)">
             </div>
-            <div class="w3-container">
+            <div class="w3-container orderer manager searcher inputfield">
               <div>תאריכים <label for="startdate_in">תחילה:</label>
                 <span><input type="date" id="startdate_in" class="dateinput"></span>
                 <label for="enddate_in">סיום:</label>
                 <span><input type="date" id="enddate_in" class="dateinput" value="2099-12-31"></span>
             </div>
-            <div class="w3-container">
+            <div class="w3-container orderer manager searcher inputfield">
               <label for="text_in" style="vertical-align: top;">תוכן ההוראה</label>
-              <textarea id="text_in" placeholder="מקום להזנת ההוראה" rows="4" cols="50"></textarea>
+              <textarea id="text_in" class="textareastyle" placeholder="מקום להזנת ההוראה" rows="4" cols="50"></textarea>
             </div>
-            <div class="w3-container">
+            <div class="w3-container orderer manager inputfield">
               <label for="reference_in">אסמכתא להוראה</label>
               <input type="text" id="reference_in" class="w3-input">
             </div>
-            <div class="w3-container">
+            <div class="w3-container orderer manager inputfield">
               <label for="reference_in">מסמכים לצירוף</label>
-              <input type="file" id="reffiles_in" multiple>
+              <input type="file" id="reffiles_in" class="w3-input" style="width:80%" multiple>
             </div>
           </div>
     </div>
     <div class="w3-container w3-cell" id="showdata_order"></div>
+    <br>
+    <div class="w3-container" style="margin-bottom: 12px;">
+      <button type="submit" id="submit_bt" class="w3-button w3-round w3-red orderer manager inputfield">שלח</button>
+      <button id="update_bt" class="w3-button w3-round w3-pink orderer manager inputfield">עדכן הוראה</button>
+      <button id="search_bt" class="w3-button w3-round w3-light-green orderer manager searcher inputfield">חפש הוראה</button>
+      <button id="delete_bt" class="w3-button w3-round w3-black orderer manager inputfield">בטל הוראה</button>
+      <button id="clear_bt" class="w3-button w3-round w3-grey orderer manager searcher inputfield" onclick="myfunc.clearfields()">נקה שדות</button>
+
+    </div>
   </body>
+
+  <script src='uiclient.js'></script>
+  <script src='myfunc.js'></script>
 
 </html>
