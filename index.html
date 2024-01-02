@@ -14,14 +14,32 @@
       .nodisplay {
         display:none;
       }
+      .redcolor {
+        background-color:rgba(255, 99, 71, 0.6);
+      }
+      @keyframes flash {
+        from {background-color: none;}
+        to {background-color: rgba(255, 255, 0, 0.651);}
+      }
+      .flashinsert {
+        animation-name: flash;
+        animation-duration: 2s;
+      }
     </style>
   </head>
 
   <body dir="rtl" data-codeword="hrorder">
 
+    <input type="number" id="runind_in" class="nodisplay" disabled>
+    <input type="number" id="state_in" class="nodisplay" disabled>
+    <div id="orderer_in" class="nodisplay"></div>
+
     <datalist id="type_list"></datalist>
 
-    <datalist id="addressee_list"></datalist>
+    <datalist id="addressee_list">
+      <option value="שכר"></option>
+      <option value="משאבי אנוש"></option>
+    </datalist>
 
     <datalist id="empid_list"></datalist>
     
@@ -35,51 +53,66 @@
       <h2 id="ordertype">הוראה</h2>
     </div>
 
+    <dialog id="cancel_dg" class="w3-round">
+      <p id="cancel_dg_msg"></p>
+      <button class="w3-button w3-border w3-round" onclick="myfunc.cancel_proceed()">כן</button>
+      <button class="w3-button w3-border w3-round" onclick="cancel_dg.close()">לא</button>
+    </dialog>
+
+    <dialog id="alert_dg" class="w3-round">
+      <p id="alert_dg_msg"></p>
+      <button class="w3-button w3-border w3-round" onclick="alert_dg.close()">סגור הודעה</button>
+    </dialog>
+    
+
     <div class="w3-container w3-cell">
           <div class="w3-container">
             <div class="w3-container orderer manager inputfield">
               <label for="addressee_in">נמען</label>
-              <input list="addressee_list" id="addressee_in" class = "w3-input">
+              <input list="addressee_list" id="addressee_in" class = "w3-input" required>
             </div>
             <div class="w3-container orderer manager searcher inputfield">
               <label for="type_in">סוג</label>
-              <input list="type_list" id="type_in" class="w3-input">
+              <input list="type_list" id="type_in" class="w3-input" required onclick="myfunc.loadtypes()">
             </div>
             <div class="w3-container orderer manager searcher inputfield">
               <label for="empid_in">מספר עובד</label>
-              <input list="empid_list" id="empid_in" class="w3-input" oninput="myfunc.getidname(this.value,this.id)" onchange="myfunc.setidname(this.value,this.id)">
+              <input list="empid_list" id="empid_in" class="w3-input" oninput="myfunc.getidname(this.value,this.id)" required>
             </div>
             <div class="w3-container orderer manager searcher inputfield">
               <label for="empname_in">שם עובד</label>
-              <input list="empname_list" id="empname_in" class="w3-input" oninput="myfunc.getidname(this.value,this.id)" onchange="myfunc.setidname(this.value,this.id)">
+              <input list="empname_list" id="empname_in" class="w3-input" oninput="myfunc.getidname(this.value,this.id)">
             </div>
             <div class="w3-container orderer manager searcher inputfield">
               <div>תאריכים <label for="startdate_in">תחילה:</label>
-                <span><input type="date" id="startdate_in" class="dateinput"></span>
+                <span><input type="date" id="startdate_in" class="dateinput" required></span>
                 <label for="enddate_in">סיום:</label>
                 <span><input type="date" id="enddate_in" class="dateinput" value="2099-12-31"></span>
             </div>
             <div class="w3-container orderer manager searcher inputfield">
               <label for="text_in" style="vertical-align: top;">תוכן ההוראה</label>
-              <textarea id="text_in" class="textareastyle" placeholder="מקום להזנת ההוראה" rows="4" cols="50"></textarea>
+              <textarea id="text_in" class="textareastyle" placeholder="מקום להזנת ההוראה" rows="4" cols="50" required></textarea>
             </div>
             <div class="w3-container orderer manager inputfield">
               <label for="reference_in">אסמכתא להוראה</label>
               <input type="text" id="reference_in" class="w3-input">
             </div>
             <div class="w3-container orderer manager inputfield">
-              <label for="reference_in">מסמכים לצירוף</label>
-              <input type="file" id="reffiles_in" class="w3-input" style="width:80%" multiple>
+              <label for="reffiles_in">מסמכים לצירוף</label>
+              <input type="file" id="reffiles_in" class="w3-input" style="width:80%">
+              <span id="existingfile"></span>
             </div>
           </div>
+        </div>
     </div>
+
     <div class="w3-container w3-cell" id="showdata_order"></div>
     <br>
     <div class="w3-container" style="margin-bottom: 12px;">
-      <button type="submit" id="submit_bt" class="w3-button w3-round w3-red orderer manager inputfield">שלח</button>
-      <button id="update_bt" class="w3-button w3-round w3-pink orderer manager inputfield">עדכן הוראה</button>
+      <button type="submit" id="submit_bt" class="w3-button w3-round w3-red orderer manager inputfield" onclick="myfunc.submit(0)">שלח</button>
+      <button id="update_bt" class="w3-button w3-round w3-pink orderer manager inputfield" onclick="myfunc.submit(1)">עדכן הוראה</button>
       <button id="search_bt" class="w3-button w3-round w3-light-green orderer manager searcher inputfield">חפש הוראה</button>
-      <button id="delete_bt" class="w3-button w3-round w3-black orderer manager inputfield">בטל הוראה</button>
+      <button id="cancel_bt" class="w3-button w3-round w3-black orderer manager inputfield" onclick="myfunc.cancel()">בטל הוראה</button>
       <button id="clear_bt" class="w3-button w3-round w3-grey orderer manager searcher inputfield" onclick="myfunc.clearfields()">נקה שדות</button>
 
     </div>

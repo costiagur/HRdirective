@@ -40,15 +40,15 @@ def pointtodir(title): #in case of direct intaraction with folders
 #
 
 class infopopup: #to show information whithout requiring users action
-    def __init__(self,parent):
-        self.top = tkinter.Toplevel(parent)
+    def __init__(self):
+        self.top = tkinter.Toplevel(root)
         self.top.attributes("-topmost", 1)
         self.lab = tkinter.Label(self.top,text = '')
         self.lab.pack()
     #
 
     def show(self,newtext):
-        self.lab['text'] = newtext
+        self.lab['text'] = self.lab['text'] + "\n" + newtext
         self.lab.update()
     #        
 

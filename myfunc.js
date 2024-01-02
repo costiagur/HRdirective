@@ -1,4 +1,28 @@
 myfunc = new Object();
+//********************************************************************************************* */
+myfunc.download = function(filename, filetext){
+
+    var a = document.createElement("a");
+
+    document.body.appendChild(a);
+
+    a.style = "display: none";
+
+    a.href = 'data:application/octet-stream;base64,' + filetext;
+
+    a.download = filename;
+
+    a.click();
+
+    document.body.removeChild(a);
+
+}
+//*********************************************************************************** */
+myfunc.alert = function(msg){
+    document.getElementById("alert_dg_msg").innerHTML = msg
+    document.getElementById("alert_dg").showModal();
+    
+}
 
 //*********************************************************************************** */
 myfunc.orderertype = function(){
@@ -16,38 +40,48 @@ myfunc.orderertype = function(){
             resobj = JSON.parse(this.responseText);
 
             if (resobj[0] == "Error"){
-                alert(resobj[1])
+                myfunc.alert(resobj[1])
             }
             else{
                 document.getElementById("username").innerHTML = resobj[1].username
+                document.getElementById("submit_bt").removeAttribute("disabled");
+                document.getElementById("orderer_in").innerHTML = resobj[1].orderertype;
 
                 if(resobj[1].orderertype == "orderer"){
                     document.getElementsByTagName("body")[0].classList.add("w3-sand")
                     document.getElementById("ordertype").innerHTML = "מתן הוראה"
                     document.getElementById("submit_bt").innerHTML = "שלח לאישור"
+                    document.getElementById("cancel_bt").innerHTML = "מחק הוראה"
+                    document.getElementById("cancel_dg_msg").innerHTML = "האם למחוק הוראה? לא ניתן יהיה לשחזרה לאחר מחיקה."
+                    document.getElementById("search_bt").classList.add("nodisplay")
                 }
                 else if (resobj[1].orderertype == "manager"){
                     document.getElementsByTagName("body")[0].classList.add("w3-pale-red")
                     document.getElementById("ordertype").innerHTML = "אישור הוראה"
                     document.getElementById("submit_bt").innerHTML = "אשר הוראה"
+                    document.getElementById("cancel_bt").innerHTML = "דחה הוראה"
+                    document.getElementById("cancel_dg_msg").innerHTML = "האם לדחות הוראה ולהחזירה לתיקונים?"
+                    document.getElementById("search_bt").classList.add("nodisplay")
                 }
                 else if (resobj[1].orderertype == "searcher"){
                     document.getElementsByTagName("body")[0].classList.add("w3-pale-green")
                     document.getElementById("ordertype").innerHTML = "חיפוש הוראה"
+                    document.getElementById("search_bt").innerHTML = "חפש הוראה"
                 }
 
                 for (eachfield of document.getElementsByClassName("inputfield")){
-                    if (eachfield.contains(resobj[1].orderertype)){
+                    if (resobj[1].orderertype == "orderer" || resobj[1].orderertype == "manager"){
                         eachfield.classList.remove("nodisplay")
                     }
                     else{
                         eachfield.classList.add("nodisplay")
                     }
                 }
+
             }    
         }
         else if (this.readyState == 4 && this.status != 200){
-            alert(this.responseText)
+            myfunc.alert(this.responseText)
         }
     }
 
@@ -59,7 +93,9 @@ myfunc.clearfields = function(){
         eachfield.value="";
     }
     document.getElementById("enddate_in").value = "2099-12-31";
-
+    document.getElementById("submit_bt").removeAttribute("disabled");
+    document.getElementById("existingfile").innerHTML="";
+    document.getElementById("showdata_order").innerHTML="";
 }
 //*********************************************************************************** */
 myfunc.getidname = function(this_value,this_id){
@@ -79,44 +115,120 @@ myfunc.getidname = function(this_value,this_id){
             resobj = JSON.parse(this.responseText);
 
             if (resobj[0] == "Error"){
-                alert(resobj[1])
+                myfunc.alert(resobj[1])
             }
             else{
                 empid_list = ""
                 empname_list = ""
-                
-                for (smallobj of resobj[1]){
-                    console.log(smallobj)
-                    empid_list += `<option value=${smallobj.empid}></option>`
-                    empname_list += `<option value="${smallobj.empname}"></option>`
-                }
 
+                if (resobj[1].length == 1){
+                    document.getElementById("empid_in").value = resobj[1][0].empid
+                    document.getElementById("empname_in").value = resobj[1][0].empname
+                    myfunc.tempselectbyempid(resobj[1][0].empid)
+                    document.getElementById("empid_in").classList.add("flashinsert")
+                    document.getElementById("empname_in").classList.add("flashinsert")
+                }
+                else{
+                    document.getElementById("empid_in").classList.remove("flashinsert")
+                    document.getElementById("empname_in").classList.remove("flashinsert")
+
+                    for (smallobj of resobj[1]){
+                        empid_list += `<option value=${smallobj.empid}></option>`
+                        empname_list += `<option value="${smallobj.empname}"></option>`
+                    }                       
+                }
                 document.getElementById("empid_list").innerHTML = empid_list;
                 document.getElementById("empname_list").innerHTML = empname_list;
             }
         }
         else if (this.readyState == 4 && this.status != 200){
-            alert(this.responseText)
+            myfunc.alert(this.responseText)
         }
     }
 
     xhr.send(fdata);     
 }
-
 //*********************************************************************************** */
-myfunc.submit = function(){ //request can be insert or update
+myfunc.loadtypes = function(){
+    var xhr = new XMLHttpRequest();
+    var fdata = new FormData();
+    
+    fdata.append("request","loadtypes")
+    
+    xhr.open('POST',"http://localhost:"+ui.port,true)
+
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {   
+            console.log(this.responseText)
+
+            resobj = JSON.parse(this.responseText);
+
+            if (resobj[0] == "Error"){
+                myfunc.alert(resobj[1])
+            }
+            else{
+                let type_list = ""
+                for (eachelem of resobj[1]){
+                    type_list += `<option value="${eachelem}"></option>`
+                }
+
+                document.getElementById("type_list").innerHTML = type_list;
+            }
+        }
+        else if (this.readyState == 4 && this.status != 200){
+            myfunc.alert(this.responseText)
+        }
+    }
+
+    xhr.send(fdata);     
+
+}
+//*********************************************************************************** */
+myfunc.submit = function(update){ //request can be insert or update
     var xhr = new XMLHttpRequest();
     var fdata = new FormData();
 
-    fdata.append("in1",document.getElementById("in1").value);
+    var required = document.querySelectorAll("input[required], textarea")
+    var anyempty = 0
+    
+    for(let eachelem of required){
+        if (eachelem.value == ""){
+            eachelem.classList.add("redcolor")
+            anyempty++
+        }
+        else{
+            eachelem.classList.remove("redcolor")
+        }
+    }
 
-    fdata.append("in2",document.getElementById("in2").value);
+    if (anyempty > 0){
+        return
+    }
 
-    fdata.append("doc1",document.getElementById("doc1").files[0]);
+    if (update == 1){
+        fdata.append("request","update")
+    }
+    else{
+        fdata.append("request","submit")
+    }
 
-    fdata.append("doc2",document.getElementById("doc2").files[0]);
+    fdata.append("runind_in",document.getElementById("runind_in").value);
 
-    fdata.append("doc3",document.getElementById("doc3").files[0]);
+    fdata.append("addressee_in",document.getElementById("addressee_in").value);
+
+    fdata.append("type_in",document.getElementById("type_in").value);
+
+    fdata.append("empid_in",document.getElementById("empid_in").value);
+
+    fdata.append("startdate_in",document.getElementById("startdate_in").value);
+
+    fdata.append("enddate_in",document.getElementById("enddate_in").value);
+
+    fdata.append("text_in",document.getElementById("text_in").value);
+    
+    fdata.append("reference_in",document.getElementById("reference_in").value);
+
+    fdata.append("reffiles_in",document.getElementById("reffiles_in").files[0]);
 
     xhr.open('POST',"http://localhost:"+ui.port,true)
 
@@ -127,36 +239,203 @@ myfunc.submit = function(){ //request can be insert or update
             resobj = JSON.parse(this.responseText);
 
             if (resobj[0] == "Error"){
-                alert(resobj[1])
+                myfunc.alert(resobj[1])
             }
             else{
-                myfunc.download(resobj[0],resobj[1])
+                myfunc.tempselectbyempid(document.getElementById("empid_in").value)
             }
         }
         else if (this.readyState == 4 && this.status != 200){
-            alert(this.responseText)
+            myfunc.alert(this.responseText)
         }
     }
 
     xhr.send(fdata);     
 }
+//********************************************************************************************* */
+myfunc.tempselectbyempid = function(empid){
+    var xhr = new XMLHttpRequest();
+    var fdata = new FormData();
 
+    fdata.append("request","tempselectbyempid")
+
+    fdata.append("empid",empid);
+
+    xhr.open('POST',"http://localhost:"+ui.port,true)
+
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {   
+            console.log(this.responseText)
+
+            resobj = JSON.parse(this.responseText);
+
+            if (resobj[0] == "Error"){
+                myfunc.alert(resobj[1])
+            }
+            else{
+                table = `<table class="w3-table w3-bordered"><thead><tr>`
+                table +="<td></td><th>אל</th><th>כותרת</th><th>תחילה</th><th>סיום</th><th>תאור</th><th>מאת</th><th>קובץ</th><th>תאריך קליטה</th><th>מצב</th></thead>"
+                table +="<tbody>"
+                for (eachrow of resobj[1]){
+                    state = ["מבוטל","ממתין לאישור","מאושר"]
+
+                    addfile = ""
+
+                    if(eachrow.filename == ""){
+                        addfile = ""
+                    }
+                    else{
+                        addfile = `<a href="#" onclick="myfunc.tempselectfilerunind(${eachrow.runind})"><img src='download.png'></a>`
+                    }
+
+                    table += `<tr data-runind="${eachrow.runind}" data-empid="${eachrow.empid}">`
+                    table += `<td><a href="#" onclick="myfunc.temploadrunind(${eachrow.runind})"><img src="open_in_full.png"></a></td>`
+                    table += `<td>${eachrow.addressee}</td>`
+                    table += `<td>${eachrow.ordercapt}</td>`
+                    table += `<td>${eachrow.startdate}</td>`
+                    table += `<td>${eachrow.enddate}</td>`
+                    table += `<td>${eachrow.ordertext}</td>`
+                    table += `<td>${eachrow.username}</td>`
+                    table += `<td>${addfile}</td>`
+                    table += `<td>${eachrow.ordertime}</td>`
+                    table += `<td>${state[eachrow.state+1]}</td>`
+                    table += "</tr>"
+                }
+
+                table += "</tbody></table>"
+                document.getElementById("showdata_order").innerHTML = table
+            }
+        }
+        else if (this.readyState == 4 && this.status != 200){
+            myfunc.alert(this.responseText)
+        }
+    }
+
+    xhr.send(fdata); 
+
+}
+//********************************************************************************************* */
+myfunc.tempselectfilerunind = function(runind){
+    var xhr = new XMLHttpRequest();
+    var fdata = new FormData();
+
+    fdata.append("request","tempselectfilerunind")
+
+    fdata.append("runind",runind);
+
+    xhr.open('POST',"http://localhost:"+ui.port,true)
+
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {   
+            console.log(this.responseText)
+
+            resobj = JSON.parse(this.responseText);
+
+            if (resobj[0] == "Error"){
+                myfunc.alert(resobj[1])
+            }
+            else{
+                myfunc.download(resobj[1].filename,resobj[1].orderfile)
+            }
+        }
+        else if (this.readyState == 4 && this.status != 200){
+            myfunc.alert(this.responseText)
+        }
+    }
+
+    xhr.send(fdata); 
+}
+//********************************************************************************************* */
+myfunc.temploadrunind = function(runind){
+    var xhr = new XMLHttpRequest();
+    var fdata = new FormData();
+
+    fdata.append("request","temploadrunind")
+
+    fdata.append("runind",runind);
+
+    xhr.open('POST',"http://localhost:"+ui.port,true)
+
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {   
+            console.log(this.responseText)
+
+            resobj = JSON.parse(this.responseText);
+
+            if (resobj[0] == "Error"){
+                myfunc.alert(resobj[1])
+            }
+            else{
+                document.getElementById("runind_in").value = resobj[1].runind
+                document.getElementById("state_in").value = resobj[1].state
+                document.getElementById("addressee_in").value = resobj[1].addressee
+                document.getElementById("type_in").value = resobj[1].ordercapt
+                document.getElementById("empid_in").value = resobj[1].empid
+                myfunc.getidname(resobj[1].empid,"empid_in");
+                document.getElementById("startdate_in").value = resobj[1].startdate
+                document.getElementById("enddate_in").value = resobj[1].enddate
+                document.getElementById("text_in").value = resobj[1].ordertext
+                document.getElementById("reference_in").value = resobj[1].reference
+                document.getElementById("existingfile").innerHTML = `${eachrow.filename}<a href="#" onclick="myfunc.tempselectfilerunind(${resobj[1].runind})"><img src='download.png'></a>`
+
+                if(document.getElementById("orderer_in").innerHTML == "orderer"){
+                    document.getElementById("submit_bt").setAttribute("disabled", "");
+                }
+
+            }
+        }
+        else if (this.readyState == 4 && this.status != 200){
+            myfunc.alert(this.responseText)
+        }
+    }
+
+    xhr.send(fdata);     
+}
+//********************************************************************************************* */
+myfunc.cancel = function(){
+
+    if(document.getElementById("runind_in").value == "" || document.getElementById("runind_in").value == undefined){
+        myfunc.alert("לא נבחרה הוראה לביטול")
+        return
+    }
+
+    document.getElementById("cancel_dg").showModal();
+}
 
 //********************************************************************************************* */
-myfunc.download = function(filename, filetext){
+myfunc.cancel_proceed = function(){
 
-    var a = document.createElement("a");
+    var xhr = new XMLHttpRequest();
+    var fdata = new FormData();
 
-    document.body.appendChild(a);
+    document.getElementById("cancel_dg").close()
 
-    a.style = "display: none";
+    runind = document.getElementById("runind_in").value
 
-    a.href = 'data:application/octet-stream;base64,' + filetext;
+    fdata.append("request","cancel")
 
-    a.download = filename;
+    fdata.append("runind",runind);
 
-    a.click();
+    xhr.open('POST',"http://localhost:"+ui.port,true)
 
-    document.body.removeChild(a);
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {   
+            console.log(this.responseText)
 
+            resobj = JSON.parse(this.responseText);
+
+            if (resobj[0] == "Error"){
+                myfunc.alert(resobj[1])
+            }
+            else{
+                myfunc.alert(resobj[1])
+                myfunc.tempselectbyempid(document.getElementById("empid_in").value)
+            }
+        }
+        else if (this.readyState == 4 && this.status != 200){
+            myfunc.alert(this.responseText)
+        }
+    }
+
+    xhr.send(fdata);     
 }
