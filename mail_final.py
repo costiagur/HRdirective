@@ -18,7 +18,7 @@ def mail_final(runind, empid,addressee,username,orderfilepath,reffilepath,listfi
             maamad = maamaddict[0]["maamad"]
         #
 
-        if maamad in (12,16,""):
+        if maamad in ("","",""):
             whom = mydb.addressee_mail("שכר_אחר")[0]
         else:
             whom = mydb.addressee_mail("שכר_קבוע")[0]
