@@ -12,7 +12,7 @@ def ordercaps():
         res.append("")
     else:
         for eachelem in reslist:
-            res.append(eachelem[0].decode('UTF-8'))
+            res.append(eachelem[0] if isinstance(eachelem[0],str) else eachelem[0].decode('UTF-8'))
         #
     #
     
