@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1"> 
     <link rel="stylesheet" href="w3.css">
+    <link rel="icon" type="image/x-icon" href="Direct.ico">
     <style>
       .dateinput {
         padding:8px;display:inline;border:none;border-bottom:1px solid #ccc;
@@ -25,6 +26,8 @@
         animation-name: flash;
         animation-duration: 2s;
       }
+      dialog {border-style: outset; background-color:rgba(255, 255, 191)}
+      fieldset{border-style: outset;}
     </style>
   </head>
 
@@ -41,6 +44,12 @@
       <option value="משאבי אנוש"></option>
     </datalist>
 
+    <datalist id="state_list">
+      <option value=-1>נדחה</option>
+      <option value=0>ממתין לאישור</option>
+      <option value=1>מאושר</option>
+    </datalist>
+
     <datalist id="empid_list"></datalist>
     
     <datalist id="empname_list"></datalist>
@@ -53,17 +62,52 @@
       <h2 id="ordertype">הוראה</h2>
     </div>
 
-    <dialog id="cancel_dg" class="w3-round">
+    <dialog id="cancel_dg">
       <p id="cancel_dg_msg"></p>
       <button class="w3-button w3-border w3-round" onclick="myfunc.cancel_proceed()">כן</button>
       <button class="w3-button w3-border w3-round" onclick="cancel_dg.close()">לא</button>
     </dialog>
 
-    <dialog id="alert_dg" class="w3-round">
+    <dialog id="authsubmit_nonexistrunid_dg">
+      <p>ניסיון לאשר הוראה לא קיימת. ליצור הוראה חדשה?</p>
+      <button class="w3-button w3-border w3-round" onclick="myfunc.submit(2);authsubmit_nonexistrunid_dg.close()">כן</button>
+      <button class="w3-button w3-border w3-round" onclick="authsubmit_nonexistrunid_dg.close()">לא</button>
+    </dialog>
+
+    <dialog id="alert_dg">
       <p id="alert_dg_msg"></p>
       <button class="w3-button w3-border w3-round" onclick="alert_dg.close()">סגור הודעה</button>
     </dialog>
     
+    <dialog id="search_dg" class="w3-round">
+        <label for="empid_sch">מספר עובד</label><input type="text" id="empid_sch" class="w3-input" maxlength="9">
+      <p>
+        <label for="empname_sch">שם עובד</label> <input type="text" id="empname_sch" class="w3-input">
+      </p>
+      <p>
+        <label for="startdate_sch">החל מ-</label><input type="date" id="startdate_sch" class="dateinput">
+        <label for="enddate_sch">עד-</label><input type="date" id="enddate_sch" class="dateinput">
+      </p>
+      <p>
+        <label for="type_sch">סוג הוראה</label> <input list="type_list" id="type_sch" class="w3-input">
+      </p>
+      <p>
+        <label for="txt_sch">טקסט</label><input type="text" id="txt_sch" class="w3-input">
+      </p>
+      <p>
+        <label for="regexp_sch">regexp&nbsp;</label><input type="checkbox" id="regexp_sch">
+      </p>
+      <p>
+        <label for="state_sch">מצב&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label><input list="state_list" id="state_sch">
+      </p>
+      <p>
+        <label for="listnum_sch">מספר רשימה&nbsp;</label><input type="number" id="listnum_sch">  
+      </p>
+      <p>
+        <button class="w3-button w3-border w3-round" onclick="myfunc.search()">חפש</button>
+        <button class="w3-button w3-border w3-round" onclick="search_dg.close()">סגור</button>
+      </p>
+    </dialog>
 
     <div class="w3-container w3-cell">
           <div class="w3-container">
@@ -77,11 +121,11 @@
             </div>
             <div class="w3-container orderer manager searcher inputfield">
               <label for="empid_in">מספר עובד</label>
-              <input list="empid_list" id="empid_in" class="w3-input" oninput="myfunc.getidname(this.value,this.id)" required>
+              <input list="empid_list" id="empid_in" class="w3-input" oninput="myfunc.getidname(this.value,this.id)" required maxlength="9" onchange="myfunc.tempselectbyempid(empid_in.value)">
             </div>
             <div class="w3-container orderer manager searcher inputfield">
               <label for="empname_in">שם עובד</label>
-              <input list="empname_list" id="empname_in" class="w3-input" oninput="myfunc.getidname(this.value,this.id)">
+              <input list="empname_list" id="empname_in" class="w3-input" oninput="myfunc.getidname(this.value,this.id)" onchange="myfunc.tempselectbyempid(empid_in.value)">
             </div>
             <div class="w3-container orderer manager searcher inputfield">
               <div>תאריכים <label for="startdate_in">תחילה:</label>
@@ -91,16 +135,21 @@
             </div>
             <div class="w3-container orderer manager searcher inputfield">
               <label for="text_in" style="vertical-align: top;">תוכן ההוראה</label>
-              <textarea id="text_in" class="textareastyle" placeholder="מקום להזנת ההוראה" rows="4" cols="50" required></textarea>
+              <textarea id="text_in" class="textareastyle" placeholder="מקום להזנת ההוראה. במקרה של קליטת רשימה, צריך ליצור קובץ אקסל עמודה ראשונה תהיה מספר עובד. שמות הכותות צריכות להיות ואמות לטקסט כאן. לדוגמה 'יש להעלות את העובד לדירוג ##דירוג## ודרגה ##דרגה##.'' כאשר מה שנמצא בין רשתיות אלה הכותרות של עמודות בקובץ" rows="4" cols="50" required></textarea>
             </div>
             <div class="w3-container orderer manager inputfield">
               <label for="reference_in">אסמכתא להוראה</label>
               <input type="text" id="reference_in" class="w3-input">
             </div>
             <div class="w3-container orderer manager inputfield">
-              <label for="reffiles_in">מסמכים לצירוף</label>
-              <input type="file" id="reffiles_in" class="w3-input" style="width:80%">
+              <label for="reffile_in">מסמכים לצירוף</label>
+              <input type="file" id="reffile_in" class="w3-input" style="width:50%">
               <span id="existingfile"></span>
+            </div>
+            <div class="w3-container orderer manager inputfield">
+              <label for="listfile_in">צירוף רשימה&nbsp;&nbsp;</label>
+              <input type="file" id="listfile_in" class="w3-input" style="width:50%">
+              <span id="existinglist"></span>
             </div>
           </div>
         </div>
@@ -111,9 +160,11 @@
     <div class="w3-container" style="margin-bottom: 12px;">
       <button type="submit" id="submit_bt" class="w3-button w3-round w3-red orderer manager inputfield" onclick="myfunc.submit(0)">שלח</button>
       <button id="update_bt" class="w3-button w3-round w3-pink orderer manager inputfield" onclick="myfunc.submit(1)">עדכן הוראה</button>
-      <button id="search_bt" class="w3-button w3-round w3-light-green orderer manager searcher inputfield">חפש הוראה</button>
       <button id="cancel_bt" class="w3-button w3-round w3-black orderer manager inputfield" onclick="myfunc.cancel()">בטל הוראה</button>
+
+      <button id="search_bt" class="w3-button w3-round w3-light-green orderer manager searcher inputfield" onclick="search_dg.showModal()">חפש הוראה</button>
       <button id="clear_bt" class="w3-button w3-round w3-grey orderer manager searcher inputfield" onclick="myfunc.clearfields()">נקה שדות</button>
+      <button id="printpdf_bt" class="w3-button w3-round w3-sand orderer manager searcher inputfield" onclick="myfunc.printpdf()">PDF</button>
 
     </div>
   </body>

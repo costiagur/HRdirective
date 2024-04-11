@@ -8,7 +8,7 @@ window.addEventListener('beforeunload',function(event){ //when closing browser, 
     var xhr = new XMLHttpRequest();
     var fdata = new FormData();
 
-    event.preventDefault()
+    //event.preventDefault()
 
     fdata.append("request",'close'); //prepare files
 

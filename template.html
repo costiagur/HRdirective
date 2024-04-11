@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>הוראה</title>
+  <meta charset="utf-8">
+  <meta name="pdfkit-page-size" content="Legal"/>
+  <meta name="pdfkit-orientation" content="Portrait"/>
+
+  <style>
+    @page {size: a4 portrait;}
+    p,label,div, strong {font-family: "David", serif;font-size: 30px;}
+    h4 {font-family: "Arial", serif; color:rgb(61, 45, 92); padding-bottom: 60px;font-size: 30px;}
+    html,body {padding-left: 12.5%;padding-right: 12.5%;padding-bottom: 0%; padding-top: 1%; height: 100%; margin: 0px;}
+    #header {position: absolute;  padding-left: 20%;  top: 0px;  z-index: -1; padding-top: 0%; padding-bottom: 12.5%;}
+    #footer {position: absolute;  bottom: 0px;  z-index: -1; padding-top: 20%; padding-bottom: 1%;justify-self: center;text-align: center;}
+    h1 {position: relative;font-family: "Arial", serif; color:rgb(61, 45, 92); right: 30px; top: 0px; padding-top: 0%;}
+  </style>
+</head>
+
+<body dir="rtl">
+  <br>
+  <h1>משאבי אנוש</h1>
+  <img id="header" src="##curdir##\top.png" alt="logo top">
+  <p style="margin-bottom: 100px;"></p>
+  <p style="text-align:left">הוראה תאריך: ##ordertime##</p>
+  <p style="text-align:left">הוראה מספר ##runind##</p>
+  <br>
+  <br>
+  <p style="text-align:right">לכבוד&nbsp;<strong>##addressee##</strong></p>
+  <br>
+  <h4 style="text-align:center"><strong>##ordercap##</strong></h4>
+  
+  <br>
+  <h4 style="text-align:center">עובד ##empid## ##empname##</h4>
+  <p style="text-align:center">תחילה: <span style="text-decoration: underline;">##startdate##</span> עד: <span style="text-decoration: underline;">##enddate##</span></p>
+  
+  <p>
+  <label for="text_div" style="vertical-align: top;"><strong>תוכן ההוראה</strong></label>
+  <div id="text_div" style="border:1px solid #ccc!important;border-radius:4px">##ordtxt##</div>
+  </p>
+  <br>
+  <p>
+  <label for="reference_div">אסמכתא להוראה</label>
+  <div id="reference_div" style="border:1px solid #ccc!important;border-radius:4px">##reftxt##</div>
+  </p>
+  
+  <br style="padding-bottom: 10px;">
+
+  <p id="addedfiles">
+    <label for="reffiles_div">צורפו מסמכים</label>
+    <div dir="rtl" style="text-align: right;" id="reffiles_div">##filename##</div>
+  </p>
+  <p id="addedlistfiles">
+    <label for="listfiles_div">צורפו מסמכים</label>
+    <div dir="rtl" style="text-align: right;" id="listfiles_div">##listfilename##</div>
+  </p>
+  
+  <br style="padding-bottom: 20px;">
+  <p>הוראה מאת: ##username##</p>
+ 
+  <br style="margin-bottom: 40px;">
+
+  <p style="text-align: left;">
+    בכבוד רב,
+    <br>
+    משאבי אנוש
+  </p>
+  <p>
+  טל"ח
+  </p>
+  <img id="footer" src="##curdir##\bottom.png" alt="logo bottom">
+  
+
+</body>
+ <script>
+  if(document.getElementById("reffiles_div").innerHTML==""){
+    document.getElementById("addedfiles").style.visibility="hidden"
+  }
+  if(document.getElementById("listfiles_div").innerHTML==""){
+    document.getElementById("addedlistfiles").style.visibility="hidden"
+  }
+ </script>
+</html>

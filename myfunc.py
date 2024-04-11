@@ -8,34 +8,29 @@ from username import username
 from searchidname import searchidname
 from ordercaps import ordercaps
 from tempinsert import tempinsert
-from tempselectall import tempselectall
-from tempselectfilerunind import tempselectfilerunind
-from temploadrunind import temploadrunind
+from selectempid import selectempid
+from getfilerunind import getfilerunind
+from loadbyrunind import loadbyrunind
 from tempupdate import tempupdate
-from tempdeleterunind import tempdeleterunind
+from deleterunind import deleterunind
+from authsubmit import authsubmit
+from authdecline import authdecline
+from search import search
+from printpdf import printpdf
+from checkempids import checkempids
 
 CODESTR = "hrorder"
 DF = ""
 
 def myfunc(queryobj):
-    #try:
+    try:
         postdict = queryobj._POST()
         filesdict = queryobj._FILES()
         
         print("POST = " + str(postdict) + "\n")
         print("FILES = " + str(filesdict) + "\n")
 
-        modified = {}
-        thedir = '.\\emplist'
-        for eachfile in os.listdir(thedir):
-            modified[os.path.getmtime(thedir + "\\" + eachfile)] = eachfile
-        #
-        tabfile =  thedir + "\\" + modified[max(modified.keys())]
-
-        DF = pd.read_csv(tabfile,sep="\t",encoding="cp1255",na_filter=True,skip_blank_lines=True,parse_dates=['תוקף עד','תוקף מ'],dayfirst=True,usecols=list(range(0,7,1)))
-        DF.rename(columns={"מספר זהות ":"empid","שם עובד":"empname","מ.נ":"mn","מספר יחידה ":"deptnum","שם מספר יחידה ":"deptname"},inplace=True)
-        DF["empidstr"] = DF["empid"].astype("string")
-        print(DF)
+ 
         replymsg = json.dumps(["Error","Failed to run specific func"]).encode('UTF-8')
 
         orderertype, empname  = username()[0]
@@ -45,7 +40,10 @@ def myfunc(queryobj):
             if orderertype == 0:
                  common.errormsg(title="שגיאה",message="משתמש לא נמצא")
             else:
-                replymsg = json.dumps(["Reply",{"orderertype":orderertype.decode('UTF-8'),"username":empname.decode('UTF-8')}]).encode('UTF-8')
+                if isinstance(orderertype,str):
+                    replymsg = json.dumps(["Reply",{"orderertype":orderertype,"username":empname}]).encode('UTF-8')
+                else:
+                    replymsg = json.dumps(["Reply",{"orderertype":orderertype.decode('UTF-8'),"username":empname.decode('UTF-8')}]).encode('UTF-8')
             #
         #
         elif postdict["request"] == "loadtypes":
@@ -57,56 +55,129 @@ def myfunc(queryobj):
                 
         elif postdict["request"] == "searchidname":
             if orderertype != 0:
-                res = searchidname(DF,postdict["this_id"],postdict["this_value"])
+                res = searchidname(postdict["this_id"],postdict["this_value"])
                 replymsg = json.dumps(["Reply",res]).encode('UTF-8')                 
             #
         #
         
         elif postdict["request"] == "submit":
-            if orderertype == b'orderer':
-                res = tempinsert(postdict["type_in"],postdict["addressee_in"],postdict["empid_in"],postdict["startdate_in"],postdict["enddate_in"], \
-                                postdict["text_in"], postdict["reference_in"], empname,filesdict["reffiles_in"][1] if bool(filesdict) else b'',filesdict["reffiles_in"][0] if bool(filesdict) else "")
-                replymsg = json.dumps(["Reply",res]).encode('UTF-8')                 
+
+            abscentids = None
+
+            if "reffile_in" not in filesdict:
+                reffile_bin = None
+                reffile_name = None
+            else:
+                reffile_bin = filesdict["reffile_in"][1]
+                reffile_name = filesdict["reffile_in"][0]
+            #
+                
+            if "listfile_in" not in filesdict:
+                listfile_bin = None
+                listfile_name = None
+            else:
+                listfile_bin = filesdict["listfile_in"][1]
+                listfile_name = filesdict["listfile_in"][0]
+                abscentids = checkempids(listfile_bin)
+
+                if len(abscentids) != 0:
+                    replymsg =  json.dumps(["Error","מספרי עובד אלה אינם קיימים {}".format(",".join(abscentids))]).encode('UTF-8')
+                #
+            #
+            if orderertype == b'orderer' or orderertype == 'orderer':
+                if abscentids is None or len(abscentids) == 0:
+                    res = tempinsert(postdict["type_in"],postdict["addressee_in"],postdict["empid_in"],postdict["startdate_in"],postdict["enddate_in"], \
+                                postdict["text_in"], postdict["reference_in"], empname, reffile_bin, reffile_name,listfile_bin,listfile_name)
+                    replymsg = json.dumps(["Reply",res]).encode('UTF-8')
+                #                 
+            #
+            elif orderertype == b'manager' or orderertype == 'manager': 
+                if abscentids is None or len(abscentids) == 0:
+                    res = authsubmit(postdict["runind_in"],postdict["type_in"],postdict["addressee_in"],postdict["empid_in"],postdict["startdate_in"],postdict["enddate_in"], \
+                                postdict["text_in"], postdict["reference_in"], empname, reffile_bin, reffile_name,listfile_bin,listfile_name)
+                    replymsg = json.dumps(["Reply",res]).encode('UTF-8')                 
+                #
             #
         #
 
         elif postdict["request"] == "update":
-            if orderertype == b'orderer':
+            if orderertype == b'orderer' or orderertype == 'orderer': #manager cannot update, only submit or decline 
+                abscentids = None
+
+                if "reffile_in" not in filesdict:
+                    reffile_bin = None
+                    reffile_name = None
+                else:
+                    reffile_bin = filesdict["reffile_in"][1]
+                    reffile_name = filesdict["reffile_in"][0]
+                #
+                
+                if "listfile_in" not in filesdict:
+                    listfile_bin = None
+                    listfile_name = None
+                else:
+                    listfile_bin = filesdict["listfile_in"][1]
+                    listfile_name = filesdict["listfile_in"][0]
+                    abscentids = checkempids(listfile_bin)
+
+                    if len(abscentids) != 0:
+                        replymsg =  json.dumps(["Error","מספרי עובד אלה אינם קיימים {}".format(",".join(abscentids))]).encode('UTF-8')
+                    #
+                #
+
                 res = tempupdate(postdict["runind_in"],postdict["type_in"],postdict["addressee_in"],postdict["empid_in"],postdict["startdate_in"],postdict["enddate_in"], \
-                                postdict["text_in"], postdict["reference_in"], empname,filesdict["reffiles_in"][1] if bool(filesdict) else b'',filesdict["reffiles_in"][0] if bool(filesdict) else "")
+                                postdict["text_in"], postdict["reference_in"], empname, reffile_bin, reffile_name,listfile_bin,listfile_name)
                 replymsg = json.dumps(["Reply",res]).encode('UTF-8')                 
             #
         # 
                         
-        elif postdict["request"] == "tempselectbyempid":
-            if orderertype == b'orderer':
-                res = tempselectall(postdict["empid"])
+        elif postdict["request"] == "selectempid":
+            if orderertype != 0:
+                res = selectempid(postdict["empid"],orderertype)
                 replymsg = json.dumps(["Reply",res]).encode('UTF-8')                 
             #
         #
-        elif postdict["request"] == "tempselectfilerunind":
+        elif postdict["request"] == "getfilerunind":
             if orderertype != 0:
-                res = tempselectfilerunind(postdict["runind"])
+                res = getfilerunind(postdict["runind"],postdict["filetype"])
                 replymsg = json.dumps(["Reply",res]).encode('UTF-8')
             #
         #
-        elif postdict["request"] == "temploadrunind":
-            if orderertype == b'orderer' or orderertype == b'manager':
-                res = temploadrunind(postdict["runind"])
+        elif postdict["request"] == "loadbyrunind":
+            if orderertype != 0:
+                res = loadbyrunind(postdict["runind"])
                 replymsg = json.dumps(["Reply",res]).encode('UTF-8')
             #
         #
         
         elif postdict["request"] == "cancel":
-            if orderertype == b'orderer': 
-                res = tempdeleterunind(postdict["runind"])
+            if orderertype == b'orderer' or orderertype == 'orderer': 
+                res = deleterunind(postdict["runind"])
                 replymsg = json.dumps(["Reply",res]).encode('UTF-8')
             #
-            elif orderertype == b'manager':
-                pass
+        #
+
+        elif postdict["request"] == "decline":
+            if orderertype == b'manager' or orderertype == 'manager': 
+                #send message to orderer that was declined. update -1
+                res = authdecline(postdict["runind"],postdict["managername"])
+                replymsg = json.dumps(["Reply",res]).encode('UTF-8')
             #
         #
-            
+        
+        elif postdict["request"] == "search":
+            if orderertype != 0:
+                res = search(postdict["empid"],postdict["empname"],postdict["startdate"],postdict["enddate"],postdict["ordercap"],postdict["ordtxt"],postdict["regexp"],postdict["state"],postdict["listnum"])
+                replymsg = json.dumps(["Reply",res]).encode('UTF-8')
+            #
+        #
+        elif postdict["request"] == "printpdf":
+            if orderertype != 0:
+                res = printpdf(postdict["runind"])
+                replymsg = json.dumps(["Reply",res]).encode('UTF-8')
+            #
+        #
+                   
         # reply message should be encoded to be sent back to browser ----------------------------------------------
         # encoding to base64 is used to send ansi hebrew data. it is decoded to become string and put into json.
         # json is encoded to be sent to browser.
@@ -124,9 +195,9 @@ def myfunc(queryobj):
         return replymsg
     #
     
-    #except Exception as e:
+    except Exception as e:
     #    common.errormsg(title=__name__,message=e)
-    #    replymsg = json.dumps(["Error","myfunc -" + str(e)]).encode('UTF-8')
-    #    return replymsg
+        replymsg = json.dumps(["Error","myfunc -" + str(e)]).encode('UTF-8')
+        return replymsg
     #
 #
