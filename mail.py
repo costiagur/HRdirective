@@ -7,7 +7,7 @@ def mymail (toaddress, fromaddress, subjecttext, bodytext):
     msg['From'] = fromaddress
     msg['To'] = toaddress
     msg.set_content (bodytext)
-    with smtplib.SMTP('oram.ramla.muni.il') as s:
+    with smtplib.SMTP('XXX.XXX.XXX.il') as s:
         s.send_message(msg)
     #
 #
