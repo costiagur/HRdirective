@@ -23,7 +23,7 @@ CODESTR = "hrorder"
 DF = ""
 
 def myfunc(queryobj):
-    try:
+    #try:
         postdict = queryobj._POST()
         filesdict = queryobj._FILES()
         
@@ -195,9 +195,8 @@ def myfunc(queryobj):
         return replymsg
     #
     
-    except Exception as e:
-    #    common.errormsg(title=__name__,message=e)
-        replymsg = json.dumps(["Error","myfunc -" + str(e)]).encode('UTF-8')
-        return replymsg
+    #except Exception as e:
+    #    replymsg = json.dumps(["Error",__name__ +":"+ str(e)]).encode('UTF-8')
+    #    return replymsg
     #
 #

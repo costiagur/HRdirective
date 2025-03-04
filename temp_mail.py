@@ -1,17 +1,31 @@
 import win32com.client
+import db
+from searchidname import searchidname
 
 def temp_mail(runind,empid,username):
     outlook = win32com.client.Dispatch('outlook.application')
     mail = outlook.CreateItem(0)
 
-    mail.To = ''
-    mail.Subject = 'הוראה {} לאישורך'.format(runind)
+    mydb = db.MYSQLDB()
+    managers = mydb.managers_select()
+    managerlist = [eachtuple[0] for eachtuple in managers]
+
+    empdict = searchidname("empid_in",empid)
+            
+    if empdict == "":
+        empname = ""
+    else:
+        empname = empdict[0]["empname"]
+    #
+
+    mail.To = ";".join(managerlist)
+    mail.Subject = 'הוראה בעניין {} לאישורך'.format(empname)
     
     mailbody = \
         '<div dir="rtl">' \
-        '<p>שלום</p>' \
-        '<p>נוצרה הוראה {} עבור עובד מספר {} לאישורך</p>' \
-        '<p>בברכה<br>{}</p></div>'.format(runind,empid,username)
+        '<p>דנה, שלום</p>' \
+        '<p>נוצרה הוראה עבור {}, {} לאישורך</p>' \
+        '<p>בברכה<br>{}</p></div>'.format(empname,empid,username)
     
 
     mail.HTMLBody = mailbody
