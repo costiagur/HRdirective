@@ -4,10 +4,10 @@ class MYSQLDB:
     
     def __init__(self):
         self.mydb = mysql.connector.connect(
-        host="XX.XX.XX.XX",
-        user="dbuser",
-        password="password",
-        database="dbname")
+        host="10.76.76.77",
+        user="kostya_hrorder",
+        password="yJSVm)W[si*yDXO8",
+        database="kostya_hrorder")
 
         self.curs = self.mydb.cursor()
     #
@@ -30,6 +30,13 @@ class MYSQLDB:
         querystr = 'SELECT `ordercapt` FROM `ordertype` WHERE 1'
         self.curs.execute(querystr)
         
+        return self.curs.fetchall()
+    #
+
+    def managers_select(self):
+        querystr = 'SELECT `name` FROM `users` WHERE `orderertype`="manager"'
+        self.curs.execute(querystr)
+
         return self.curs.fetchall()
     #
 
@@ -309,10 +316,17 @@ class MYSQLDB:
         if len(empid) == 0:
             pass
         else:
-            querystr = querystr + " AND `empid` IN {}".format(empid)
+            if type(empid) == tuple:
+                empid = list(empid)
+                for ind,eachid in enumerate(empid):
+                    if eachid == "":
+                        empid.remove(eachid)
+                    #
+                    empid[ind] = str(eachid)
+                #
+            #
+            querystr = querystr + " AND `empid` IN ({})".format(",".join(empid))
         #
-
-        print(querystr)
 
         if ordercapt == "":
             pass
