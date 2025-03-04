@@ -1,8 +1,9 @@
 import win32com.client
 import db
 from searchidname import searchidname
+import username
 
-def mail_final(runind, empid,addressee,username,orderfilepath,reffilepath,listfilepath):
+def mail_final(runind, empid,addressee,orderer,orderfilepath,reffilepath,listfilepath):
 
     mydb = db.MYSQLDB()
 
@@ -18,16 +19,16 @@ def mail_final(runind, empid,addressee,username,orderfilepath,reffilepath,listfi
             maamad = maamaddict[0]["maamad"]
         #
 
-        if maamad in ("","",""):
+        if maamad in (12,16,""):
             whom = mydb.addressee_mail("שכר_אחר")[0]
         else:
             whom = mydb.addressee_mail("שכר_קבוע")[0]
         #
         whom = whom if isinstance(whom, str) else whom.decode('UTF-8')
-        mail.CC = username
+        mail.CC = orderer
 
     elif addressee == "משאבי אנוש":
-        whom = username
+        whom = orderer
     #
     
     mail.To = whom
@@ -37,7 +38,7 @@ def mail_final(runind, empid,addressee,username,orderfilepath,reffilepath,listfi
         '<div dir="rtl">' \
         '<p>שלום רב</p>' \
         '<p>נוצרה הוראה {} עבור עובד מספר {}</p>' \
-        '<p>בברכה<br>{}</p></div>'.format(runind,empid,username)
+        '<p>בברכה<br>{}</p></div>'.format(runind,empid,username.username()[0][1])
     
 
     mail.HTMLBody = mailbody

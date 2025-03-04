@@ -40,7 +40,7 @@ myfunc.orderertype = function(){
 
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {   
-            console.log(this.responseText)
+            //console.log(this.responseText)
 
             resobj = JSON.parse(this.responseText);
 
@@ -142,7 +142,7 @@ myfunc.getidname = function(this_value,this_id){
 
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {   
-            console.log(this.responseText)
+            //console.log(this.responseText)
 
             resobj = JSON.parse(this.responseText);
 
@@ -191,7 +191,7 @@ myfunc.loadtypes = function(){
 
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {   
-            console.log(this.responseText)
+            //console.log(this.responseText)
 
             resobj = JSON.parse(this.responseText);
 
@@ -259,6 +259,16 @@ myfunc.submit = function(update){ //request can be insert or update
 
     fdata.append("empid_in",document.getElementById("empid_in").value);
 
+    if (document.getElementById("startdate_in").value == '0001-01-01' || document.getElementById("startdate_in").value == '0000-00-00'){
+        myfunc.alert("תאריך תחילה אינו יכול להיות אפסי");
+        return;
+    }
+
+    if (document.getElementById("enddate_in").value == '0001-01-01' || document.getElementById("startdate_in").value == '0000-00-00'|| document.getElementById("startdate_in").value == ''){
+        myfunc.alert("תאריך סיום אינו יכול להיות אפסי");
+        return;
+    }
+
     fdata.append("startdate_in",document.getElementById("startdate_in").value);
 
     fdata.append("enddate_in",document.getElementById("enddate_in").value);
@@ -275,7 +285,7 @@ myfunc.submit = function(update){ //request can be insert or update
 
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {   
-            console.log(this.responseText)
+            //console.log(this.responseText)
 
             resobj = JSON.parse(this.responseText);
 
@@ -306,7 +316,7 @@ myfunc.tempselectbyempid = function(empid){
 
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {   
-            console.log(this.responseText)
+            //console.log(this.responseText)
 
             resobj = JSON.parse(this.responseText);
 
@@ -340,7 +350,7 @@ myfunc.getfilerunind = function(runind,filetype){
 
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {   
-            console.log(this.responseText)
+            //console.log(this.responseText)
 
             resobj = JSON.parse(this.responseText);
 
@@ -371,7 +381,7 @@ myfunc.loadbyrunind = function(runind){
 
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {   
-            console.log(this.responseText)
+            //console.log(this.responseText)
 
             resobj = JSON.parse(this.responseText);
 
@@ -448,7 +458,7 @@ myfunc.cancel_proceed = function(){
 
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {   
-            console.log(this.responseText)
+            //console.log(this.responseText)
 
             resobj = JSON.parse(this.responseText);
 
@@ -482,7 +492,7 @@ myfunc.authdecline = function(){
 
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {   
-            console.log(this.responseText)
+            //console.log(this.responseText)
 
             resobj = JSON.parse(this.responseText);
 
@@ -526,13 +536,13 @@ myfunc.search = function(){
 
     fdata.append("listnum",document.getElementById("listnum_sch").value);  
 
-    console.log(fdata)
+    //console.log(fdata)
 
     xhr.open('POST',"http://localhost:"+ui.port,true)
 
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {   
-            console.log(this.responseText)
+            //console.log(this.responseText)
 
             resobj = JSON.parse(this.responseText);
 
@@ -610,7 +620,7 @@ myfunc.printpdf = function(){
 
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {   
-            console.log(this.responseText)
+            //console.log(this.responseText)
 
             resobj = JSON.parse(this.responseText);
 
